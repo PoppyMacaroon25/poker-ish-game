@@ -1,0 +1,252 @@
+
+from random import randrange
+
+#---CLASSES--------------------------------------------
+#all card values
+suits = ['heart', 'diamonds', 'spades', 'clubs']
+faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'A', 'J', 'Q', 'K']
+values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 10, 10, 10]
+
+
+#defining the Card class--------------------------
+class Card:
+
+  def __init__(self, face, suit):
+    self.face = face
+    self.suit = suit
+    if self.face.isnumeric():
+      self.value = int(self.face)
+    elif self.face == '10':
+      self.value = 10
+    elif self.face == 'A':
+      self.value = 11
+    elif self.face == 'J':
+      self.value = 10
+    elif self.face == 'Q':
+      self.value = 10
+    elif self.face == 'K':
+      self.value = 10
+  
+
+  def printCardInfo(self):  #for testing
+    print("suit: " + self.suit)
+    print("face: " + self.face)
+    print("value: " + str(self.value))
+    print()
+
+  def showCard(self):
+    return str(self.face) + " of " + str(self.suit)
+
+  def __str__(self):
+    return f"Face: {self.face}, Suit: {self.suit}"
+#-----------------------------------------
+
+#----Hand Class-----------------------------------------
+class Hand:
+
+  def __init__(self):
+    self.hand = []
+    self.hand.append(randCard())
+    self.value = self.hand[0].value
+    #print(self.hand[0].value)
+  def hit(self):
+    self.hand.append(randCard())
+    #print(self.value)
+    self.value = self.value + self.hand[len(self.hand) - 1].value
+    #print(self.value)
+    self.showHand()
+   # print(self.value)
+
+  def showHand(self):
+    for i in range(0, len(self.hand) - 1):
+      print(self.hand[i].showCard() + ", ", end=" ")
+    print(self.hand[len(self.hand) - 1].showCard())
+#----------------------------------------------------------
+
+#defining the Deck class----------------------------------
+class Deck:
+    def __init__(self):
+        self.fullDeck = []
+        self.playDeck = self.fullDeck  # will change as cards are used
+
+        # create cards in deck
+        for suit in suits:
+            for face in faces:
+                temp_card = Card(face, suit)
+                self.fullDeck.append(temp_card)
+
+                if temp_card.face.isnumeric():
+                    temp_card.value = int(temp_card.face)
+                elif temp_card.face == '10':
+                    temp_card.value = 10
+                elif temp_card.face == 'A':
+                    temp_card.value = 11
+                elif temp_card.face == 'J':
+                    temp_card.value = 10
+                elif temp_card.face == 'Q':
+                    temp_card.value = 10
+                elif temp_card.face == 'K':
+                    temp_card.value = 10
+
+    def getValue(self):
+        return self
+
+    
+#--------------------------------------------
+
+
+#---GAMEPLAY FUNCTIONS CODE------------------------------
+#returns a card object, and removes that card from the play list so it won't be drawn again
+def randCard():
+  index = randrange(0, len(theDeck.playDeck) - 1)
+  return theDeck.playDeck.pop(index)
+
+def deal(dealer, player):
+  #first cards
+  print()
+#dealer hit
+  print(" ")
+  print("Dealer:")
+  dealer.hit()
+  #print(dealer.hand[0].showCard() + ", hidden card")
+  print()
+#player hit
+  print(" ")
+  print("Player:")
+  player.hit()
+  #player.showHand()
+  #show hands
+  #print("Dealer:")
+  #dealer.showHand()
+  #print("Player:")
+  #player.showHand()
+
+def isBust(dealer, player):
+  if player.value > 21 or dealer.value > 21:
+    return True
+  else:
+    return False
+    
+def isBlackjack(dealer,player):
+   if player.value == 21 or dealer.value == 21:
+    return True
+   else:
+    return False
+    
+#input parameters are Hand objects
+def endGameCheck(dealer, player):
+  #win conditions
+  if player.value == 21 and dealer.value != 21:
+    print("Blackjack! player wins!")
+    print()
+    print()
+    return True
+  elif player.value < 21 and dealer.value > 21:
+    print("dealer bust! player wins!")
+    print()
+    print()
+    return True
+  #lose conditions
+  elif dealer.value == 21 and player.value != 21:
+    print("Dealer blackjack! wins!")
+    print()
+    print()
+    return True
+  elif dealer.value < 21 and player.value > 21:
+    print("player bust! Dealer wins!")
+    print()
+    print()
+    return True
+  #both win or lose conditions
+  elif player.value == 21 and dealer.value == 21: 
+    print("Blackjack! Tie!")
+    print()
+    print()
+    return True
+  elif player.value == dealer.value: 
+    print("Tie!")
+    print()
+    print()
+    return True  
+  elif player.value > dealer.value: 
+    print("Player wins!")
+    print()
+    print()
+    return True
+  elif player.value < dealer.value: 
+    print("Dealer wins!")
+    print()
+    print()
+    return True
+  else:
+    return False
+
+#function that checks if dealer needs to hit
+def dealerCheck(dealer, player): 
+  while dealer.value <= 16:
+    print(" ")
+    print("Dealer:")
+    dealer.hit()
+  endGameCheck(dealer, player)
+
+#--MAIN GAMEPLAY---------------------------
+def playGame(dealerHand, playerHand): 
+#---Turn Loop---
+  while True:
+    userInput = input("stand or hit? (s/h):").lower()
+    if userInput == "h":
+      print(" ")
+      print("Player:")
+      playerHand.hit()
+      if isBust(dealerHand,playerHand) or isBlackjack(dealerHand,playerHand):
+        endGameCheck(dealerHand,playerHand)
+        break
+    elif userInput == "s":
+      dealerCheck(dealerHand,playerHand)        
+      break
+#---Ask to play again-------------- 
+  userIn = input("Play another game?(y/n): ").lower()
+  if userIn == "n":
+    print("Bye!")
+    return False
+  else:
+    print("Great, Let's Play Again!!!")
+    print()
+    print("----New Game----")
+    return True
+#-------------------------------------    
+
+#---CONSOLE AND GAME--------------------------------------
+#variable declarations to keep track of
+userIn = ""
+startGame = False
+theDeck = Deck()
+moreDealerCards = True
+#print title card
+print("┏━━┓┏┓╋╋╋╋╋╋┏┓╋╋╋╋╋╋╋╋┏┓╋╋")
+print("┃┏┓┃┃┃╋╋╋╋╋╋┃┃╋┏┓╋╋╋╋╋┃┃╋╋")
+print("┃┗┛┗┫┃┏━━┳━━┫┃┏╋╋━━┳━━┫┃┏┓")
+print("┃┏━┓┃┃┃┏┓┃┏━┫┗┛╋┫┏┓┃┏━┫┗┛┛")
+print("┃┗━┛┃┗┫┏┓┃┗━┫┏┓┫┃┏┓┃┗━┫┏┓┓")
+print("┗━━━┻━┻┛┗┻━━┻┛┗┫┣┛┗┻━━┻┛┗┛")
+print("╋╋╋╋╋╋╋╋╋╋╋╋╋╋┏┛┃╋╋╋╋╋╋╋╋╋")
+print("╋╋╋╋╋╋╋╋╋╋╋╋╋╋┗━┛╋╋╋╋╋╋╋╋╋")
+print(" ")
+print("This is a modified/simplfied verson of BlackJack with only a player and the dealer ")
+print("--------------------------")
+print("A few changes: ")
+print("- A is always 11 ")
+print("- There are no hidden cards")
+print("- Player can only hit or stand ")
+print("--------------------------")
+print(" ")
+toStart = input("Start a game?(y/n):")
+if toStart == 'y':
+  startGame = True
+  while startGame:
+    dealerHand = Hand() #created the hands for dealer and player
+    playerHand = Hand()
+    deal(dealerHand, playerHand)
+    startGame = playGame(dealerHand, playerHand)
+else:
+  print("Bye!")
